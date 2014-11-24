@@ -133,12 +133,14 @@ public class MeshScript : MonoBehaviour {
 
 	private bool wasEmpty = true;
 
+	private int currentVertex = -1;
 
+	int switchCounter = 0;
 	// Update is called once per frame
 	void Update () {
 
 		Frame frame = controller.Frame();
-		Debug.Log (frame.Hands.IsEmpty);
+
 
 		if (!frame.Hands.IsEmpty) {
 						// get a hand
@@ -159,7 +161,7 @@ public class MeshScript : MonoBehaviour {
 
 
 						Hand leapHand = h.GetLeapHand ();
-						Debug.Log (leapHand.GrabStrength);
+						
 
 						bool justSwitched = false;
 
@@ -168,6 +170,10 @@ public class MeshScript : MonoBehaviour {
 						isGrabbing = leapHand.GrabStrength > 0.9;
 
 						justSwitched = beforeCheck != isGrabbing;
+
+						if(justSwitched){
+							Debug.Log ("switched " + switchCounter++);
+						}
 				
 
 
@@ -181,6 +187,7 @@ public class MeshScript : MonoBehaviour {
 
 								if (justSwitched) {
 										handtempY = p.y;
+										currentVertex = closestVectorIndex;
 										vertexY = vertices [closestVectorIndex].y;
 								}
 
@@ -188,11 +195,11 @@ public class MeshScript : MonoBehaviour {
 
 								float newVertexPositionY = vertexY + delta;
 
-								vertices [closestVectorIndex].y = newVertexPositionY;
+								vertices [currentVertex].y = newVertexPositionY;
 
-								Vector3 oldSpherePosition = handles [closestVectorIndex].transform.localPosition;
+								Vector3 oldSpherePosition = handles [currentVertex].transform.localPosition;
 								oldSpherePosition.y = newVertexPositionY;
-								handles [closestVectorIndex].transform.localPosition = oldSpherePosition;
+								handles [currentVertex].transform.localPosition = oldSpherePosition;
 
 
 
@@ -281,11 +288,7 @@ public class MeshScript : MonoBehaviour {
 
 		m.vertices = vertices;
 
-		for(int i = 0; i < num_vertices; i++){
-			Debug.Log(m.vertices[i]);
-			Debug.Log(m.uv[i]);
-		}
-
+	
 
 
 		// number of triangles
@@ -321,10 +324,7 @@ public class MeshScript : MonoBehaviour {
 
 		m.triangles = triangles;
 
-		for (int i = 0; i < num_triangles; i++) {
-			Debug.Log(m.triangles[i]);
-		}
-
+	
 
 		m.RecalculateNormals();
 		
