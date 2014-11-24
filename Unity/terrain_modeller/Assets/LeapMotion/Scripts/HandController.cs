@@ -264,6 +264,8 @@ public class HandController : MonoBehaviour {
     HandModel[] models = new HandModel[hand_physics_.Count];
     hand_physics_.Values.CopyTo(models, 0);
     return models;
+
+	
   }
 
   public void DestroyAllHands() {
