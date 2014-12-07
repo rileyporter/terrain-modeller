@@ -96,6 +96,7 @@ public class HandController : MonoBehaviour {
   protected HandModel CreateHand(HandModel model) {
     HandModel hand_model = Instantiate(model, transform.position, transform.rotation)
                            as HandModel;
+	hand_model.transform.parent = transform.parent;
     hand_model.gameObject.SetActive(true);
     Leap.Utils.IgnoreCollisions(hand_model.gameObject, gameObject);
     return hand_model;
