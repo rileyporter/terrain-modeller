@@ -16,6 +16,8 @@ public class GrabControllerOVR : MonoBehaviour {
 	void OnGUI(){
 		GUI.Label (new Rect (300f, 300f, 100f, 100f), (isGrabbing) ? "grabbing" : "not grabbing");
 	}
+
+
 	
 	
 	private bool isGrabbing = false;
@@ -25,6 +27,9 @@ public class GrabControllerOVR : MonoBehaviour {
 	Vector3 startingPosition;
 	Vector3 tempGameObjectPosition;
 	Vector3 previousDelta;
+
+	Vector leapStartingPosition;
+
 	
 	/*
 	private Vector3 getZXPlane (Vector3 v){
@@ -55,7 +60,7 @@ public class GrabControllerOVR : MonoBehaviour {
 		if (hand != null) {
 			
 			HandModel h = hand;
-			Vector3 p = h.GetPalmPosition ();
+			Vector3 palmposition = h.GetPalmPosition ();
 			Hand leapHand = h.GetLeapHand ();
 
 			bool justSwitched = false;
@@ -71,8 +76,11 @@ public class GrabControllerOVR : MonoBehaviour {
 				
 				
 				if (justSwitched) {
-					startingPosition = p;	
+					startingPosition = palmposition;	
 					tempGameObjectPosition = gameObject.transform.localPosition;	
+
+					leapStartingPosition = leapHand.PalmPosition;
+
 
 					// calculate Vcl
 					//Vcl = handController.transform.position - cameraRig.transform.position;
@@ -83,19 +91,34 @@ public class GrabControllerOVR : MonoBehaviour {
 					
 				}
 
-				startingPosition += previousDelta;
-				Vector3 unityDelta = p - startingPosition; // startingPosition - p
 
-				Debug.Log(unityDelta);
+				//Vector3 unityDelta = startingPosition - palmposition; // startingPosition - p
+				//startingPosition = palmposition;
 
-				previousDelta = unityDelta;
-				
-				// scale unity delta
-				//unityDelta = unityDelta * -0.1f;
-				unityDelta.x = 0;
-				unityDelta.y = 0;
+				Vector leapDelta = leapStartingPosition - leapHand.PalmPosition;
 
-				Vector3 newGameObjectPosition =  ((unityDelta.z) * new Vector3(0f, 0f, 1f)) + tempGameObjectPosition;
+				Vector3 unityDelta = new Vector3(leapDelta.z,leapDelta.x,leapDelta.y*-1.0f);
+				unityDelta = unityDelta * 0.1f;
+
+				float scaledYDistance = leapDelta.y;
+				float scaledXDistance = leapDelta.x * -1.0f;
+				float scaledZDistance = leapDelta.z * -1.0f;
+
+				Vector3 camForward = cameraRig.leftEyeAnchor.camera.transform.forward;
+				camForward.Normalize();
+
+				Vector3 camRight = cameraRig.leftEyeAnchor.camera.transform.right;
+				camRight.Normalize();
+
+				Vector3 camUp = cameraRig.leftEyeAnchor.camera.transform.up;
+				camUp.Normalize();
+
+
+
+
+				//Vector3 newGameObjectPosition =  (scaledYDistance *camForward) + tempGameObjectPosition;
+				//Vector3 newGameObjectPosition =  (scaledXDistance *camRight) + tempGameObjectPosition;
+				Vector3 newGameObjectPosition =  (scaledZDistance *camUp) +(scaledXDistance *camRight) + (scaledYDistance *camForward) + tempGameObjectPosition;
 				
 				gameObject.transform.localPosition = newGameObjectPosition;
 				
