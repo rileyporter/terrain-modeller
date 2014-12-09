@@ -6,7 +6,13 @@ public class GrabController : MonoBehaviour {
 
 
 	public HandController handController;
-	public OVRCameraRig cameraRig;	
+
+	public GameObject cameraRig;
+	public Camera camera;
+
+	public GameObject debugIndicator1;
+	public GameObject debugIndicator2;
+
 
 	// Use this for initialization
 	void Start () {
@@ -95,10 +101,7 @@ public class GrabController : MonoBehaviour {
 				Debug.Log ("switched " + switchCounter++);
 			}
 			
-			
-			
-			
-		
+
 			
 			
 			if (isGrabbing) {
@@ -112,21 +115,17 @@ public class GrabController : MonoBehaviour {
 					tempGameObjectRotation = gameObject.transform.localEulerAngles;
 
 					// get distance from Ls to Lb
-					dist_z = handController.transform.localPosition.z - cameraRig.transform.localPosition.z;
-					dist_z *= 55;
+					dist_z = -800;
+
 
 					// calculate Lb
-					Lb = leapPalmPositionXZPlane - (new Vector(0, 0, dist_z));
-					//Debug.Log(Lb +  " "+  tempPosition);
+					Lb = -(new Vector(0, 0, dist_z));
+
+
+
 
 					LbsXZ = leapPalmPositionXZPlane - Lb;
 					LbsYZ = leapPalmPositionYZPlane - Lb;
-
-
-					// calculate Vcl
-					Vcl = handController.transform.position - cameraRig.transform.position;
-					Vcl.Normalize();
-
 
 				}
 
@@ -135,7 +134,6 @@ public class GrabController : MonoBehaviour {
 
 				Vector LbiXZ = leapPalmPositionXZPlane - Lb;
 				Vector LbiYZ = leapPalmPositionYZPlane - Lb;
-				//Debug.Log (Mathf.Sqrt(Lbi.Dot(Lbi)));
 
 				float dotPXZ = LbiXZ.Normalized.Dot (LbsXZ.Normalized);
 				float dotPYZ = LbiYZ.Normalized.Dot (LbsYZ.Normalized);
@@ -159,21 +157,21 @@ public class GrabController : MonoBehaviour {
 				}else{
 					
 				}
-				angleYZ = 0;
+				//angleYZ = 0;
 
-				Vector3 newRotation = tempGameObjectRotation + new Vector3(angleYZ*2f,angleXZ, 0);
-				newRotation.x = (newRotation.x+360) % 360;
-				newRotation.y = (newRotation.y+360) % 360;
-				newRotation.z = (newRotation.z+360) % 360;
+				Vector3 newRotation = tempGameObjectRotation + new Vector3(angleYZ*-2f,angleXZ*6.0f, 0);
+				newRotation.x = (newRotation.x+360);
+				newRotation.y = (newRotation.y+360);
+				newRotation.z = (newRotation.z+360);
 				gameObject.transform.localEulerAngles = newRotation;
 
 
-				Debug.Log(angleXZ + " " + angleYZ);
+				Debug.Log(angleXZ + ", " + angleYZ);
 
 				Vector leapDelta = startingPositionXZ - leapPalmPosition;
-
+					
 				// Convert leap Delta to unity delta
-				leapDelta = leapDelta * 0.1f;
+				leapDelta = leapDelta;
 				leapDelta.x = 0;
 				leapDelta.y = 0;
 
@@ -181,7 +179,7 @@ public class GrabController : MonoBehaviour {
 
 				//Debug.Log(tempPosition + " " + p + " " + new_delta + " " + delta);
 
-				Vector3 newGameObjectPosition =  (	unityDelta.z * Vcl) + tempGameObjectPosition;
+				Vector3 newGameObjectPosition =  (	unityDelta.z * camera.transform.forward.normalized) + tempGameObjectPosition;
 				
 				gameObject.transform.localPosition = newGameObjectPosition;
 				
