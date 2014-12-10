@@ -25,7 +25,7 @@ public class Gaussian : MonoBehaviour {
 
 
 	// must take an odd number as length
-	float[,] generateGaussian(int length, double weight) {
+	public static float[,] generateGaussian(int length, double weight) {
 		float[,] Kernel = new float [length, length];  
 		float sumTotal = 0;  
 		int kernelRadius = length / 2;  
@@ -55,7 +55,7 @@ public class Gaussian : MonoBehaviour {
 		return Kernel;  
 	}
 
-	void printArr(float[,] arr) {
+	public static void printArr(float[,] arr) {
 		int rowLength = arr.GetLength (0);
 		int colLength = arr.GetLength (1);
 		
@@ -70,7 +70,7 @@ public class Gaussian : MonoBehaviour {
 	}
 	
 	
-	void applyFilter (float[,] data, float[,] filter, int startRow, int startCol) {
+	public static void applyFilter (float[,] data, float[,] filter, int startRow, int startCol) {
 		float scale = 5.0f;
 		int filterRowLength = filter.GetLength (0);
 		int filterColLength = filter.GetLength (1);

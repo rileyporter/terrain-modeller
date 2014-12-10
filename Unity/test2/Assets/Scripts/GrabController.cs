@@ -10,13 +10,15 @@ public class GrabController : MonoBehaviour {
 	public GameObject cameraRig;
 	public Camera camera;
 
+	private ManipulatorControl manipulator;
+
 	public GameObject debugIndicator1;
 	public GameObject debugIndicator2;
 
 
 	// Use this for initialization
 	void Start () {
-	
+		manipulator = (ManipulatorControl) GetComponent("ManipulatorControl");
 	}
 
 	void OnGUI(){
@@ -67,10 +69,17 @@ public class GrabController : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
+		if (manipulator.pointSelected ()) {
+			return;
+		}
+
+
 		if (handController.GetAllGraphicsHands ().Length == 0)
 						return;
 
-		HandModel hand = handController.GetAllGraphicsHands()[0];
+
+
+		HandModel hand = manipulator.getDominantHand ();
 
 		if (hand != null) {
 
