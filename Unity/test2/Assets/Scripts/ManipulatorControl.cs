@@ -76,6 +76,8 @@ public class ManipulatorControl : MonoBehaviour {
 	int modification_pos_y;
 
 	float[,] height_buffer;
+	float[,] kernel;
+
 	// Update is called once per frame
 	public void Update () {
 		// see if we have a hand
@@ -221,6 +223,8 @@ public class ManipulatorControl : MonoBehaviour {
 					height_buffer = td.GetHeights(modification_pos_x, modification_pos_y, kernelDimension, kernelDimension);
 
 
+					kernel = Gaussian.generateGaussian(kernelDimension, 10.0);
+
 
 
 
@@ -231,7 +235,7 @@ public class ManipulatorControl : MonoBehaviour {
 					
 
 
-					float scaledDist = distY / 1000.0f;
+					float scaledDist = distY;
 
 					print(scaledDist);
 
@@ -239,14 +243,29 @@ public class ManipulatorControl : MonoBehaviour {
 
 					for (int x = 0; x < kernelDimension; x++) {
 						for(int y = 0; y < kernelDimension; y++){
-						temp_heights[x,y] = Mathf.Min(height_buffer[x,y] + scaledDist, 1.0f);
+						temp_heights[x,y] = Mathf.Min(height_buffer[x,y]+  height_buffer[x,y]*kernel[x,y]*scaledDist, 1.0f);
 						}		
-					
+						
 					}
+
+					// set the heights in the terrain
+					td.SetHeights(modification_pos_x, modification_pos_y, temp_heights);
 
 					
 					
-					//print (distY);
+					// and update the balls position
+					// calculate the absolute height
+					float t_y = terrain.transform.position.y;	
+					
+					// get the current height in this position
+					float t_height_unscaled = temp_heights[(kernelDimension / 2) , (kernelDimension / 2)];	
+					float t_height_scaled = t_height_unscaled * td.size.y;
+
+					// generate the new indicator position
+					Vector3 newIndPos = positionIndicator.transform.position;
+					newIndPos.y = t_height_scaled +t_y;
+					positionIndicator.transform.position = newIndPos;
+
 					
 				}
 				
