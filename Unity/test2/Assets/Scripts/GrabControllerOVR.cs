@@ -7,14 +7,15 @@ public class GrabControllerOVR : MonoBehaviour {
 	
 	public HandController handController;
 	public OVRCameraRig cameraRig;	
+	private ManipulatorControl manipulator;
 	
 	// Use this for initialization
 	void Start () {
-		
+		manipulator = (ManipulatorControl) GetComponent("ManipulatorControl");
 	}
 	
 	void OnGUI(){
-		GUI.Label (new Rect (300f, 300f, 100f, 100f), (isGrabbing) ? "grabbing" : "not grabbing");
+		//GUI.Label (new Rect (300f, 300f, 100f, 100f), (isGrabbing) ? "grabbing" : "not grabbing");
 	}
 
 
@@ -51,11 +52,15 @@ public class GrabControllerOVR : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if (manipulator.pointSelected ()) {
+			return;
+		}
+		
 		
 		if (handController.GetAllGraphicsHands ().Length == 0)
 			return;
 		
-		HandModel hand = handController.GetAllGraphicsHands()[0];
+		HandModel hand = manipulator.getDominantHand ();
 		
 		if (hand != null) {
 			

@@ -15,6 +15,8 @@ public class ManipulatorControl : MonoBehaviour {
 
 	public bool rightIsDominant = true;
 
+	public bool isOculus = false;
+
 	public Vector3 indiciatorOffset = new Vector3(0.0f, 0.0f, 0.0f);
 
 	private Vector3 posInTerrainCoordinates;
@@ -42,6 +44,12 @@ public class ManipulatorControl : MonoBehaviour {
 		//print ("parent");
 	}
 
+
+	static int DEBOUNCE_FRAMES = 1000;
+
+
+
+
 	private bool selected = false;
 
 	public bool pointSelected(){
@@ -66,11 +74,12 @@ public class ManipulatorControl : MonoBehaviour {
 	}
 
 	private bool isGrabbing = false;
+	private bool isGrabbingNonDominant = false;
 
 
 	Vector previousHandPosition;
 
-	public int kernelDimension = 101;
+	public int kernelDimension = 10;
 
 	int modification_pos_x;
 	int modification_pos_y;
@@ -78,11 +87,19 @@ public class ManipulatorControl : MonoBehaviour {
 	float[,] height_buffer;
 	float[,] kernel;
 
+
+	private int frame_counter = 0;
+
+	private bool hasNonDominantHand = false;
+
+
+
 	// Update is called once per frame
 	public void Update () {
 		// see if we have a hand
 
 
+		hasNonDominantHand = false;
 		if (handController.GetAllGraphicsHands ().Length == 0)
 			return;
 
@@ -90,6 +107,7 @@ public class ManipulatorControl : MonoBehaviour {
 		if (handController.GetAllGraphicsHands ().Length == 1) {
 		 	dominantHand = handController.GetAllGraphicsHands () [0];
 		} else {
+			hasNonDominantHand = true;
 			// decide which hand is in
 			HandModel firstHand = handController.GetAllGraphicsHands()[0];
 			HandModel secondHand = handController.GetAllGraphicsHands()[1];
@@ -148,6 +166,31 @@ public class ManipulatorControl : MonoBehaviour {
 
 
 		// selecting
+		// check if we should select
+		if (hasNonDominantHand) {
+
+			bool njustSwitched = false;
+			
+			bool nbeforeCheck = isGrabbingNonDominant;
+			
+			isGrabbingNonDominant = nonDominantHand.GetLeapHand().GrabStrength > 0.9;
+
+			//print(isGrabbingNonDominant);
+
+			njustSwitched = nbeforeCheck != isGrabbingNonDominant;
+
+			if(njustSwitched && !isGrabbingNonDominant){
+				selected = !selected;
+			}
+
+		
+		}
+
+		/*
+		if (g) {
+			
+		}
+
 
 
 		foreach (Gesture g in handController.GetFrame ().Gestures()) {
@@ -173,6 +216,7 @@ public class ManipulatorControl : MonoBehaviour {
 
 
 		}
+		*/	
 
 
 
@@ -233,9 +277,15 @@ public class ManipulatorControl : MonoBehaviour {
 					
 					float distY = leapHand.PalmPosition.y - previousHandPosition.y;
 					
+					float inverter = 1;
+
+					if(isOculus){
+						inverter = -1.0f;
+					}
+					
+					float scaledDist = distY * inverter;
 
 
-					float scaledDist = distY;
 
 					print(scaledDist);
 

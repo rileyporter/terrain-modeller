@@ -22,7 +22,7 @@ public class GrabController : MonoBehaviour {
 	}
 
 	void OnGUI(){
-		GUI.Label (new Rect (300f, 300f, 100f, 100f), (isGrabbing) ? "grabbing" : "not grabbing");
+		//GUI.Label (new Rect (300f, 300f, 100f, 100f), (isGrabbing) ? "grabbing" : "not grabbing");
 	}
 
 
